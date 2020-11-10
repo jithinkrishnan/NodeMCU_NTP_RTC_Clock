@@ -2,7 +2,7 @@
 *   ESP8266 NTP - DS3231 RTC HW-069 Display Time sync
 *   File:   NodeMCU_NTP_RTC_Clock.ino
 *   Author:  Jithin Krishnan.K
-*       Rev. 1.0 : 11/10/2020 :  03:42 PM
+*       Rev. 1.0 : 10/11/2020 :  03:42 PM
 * 
 * This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
