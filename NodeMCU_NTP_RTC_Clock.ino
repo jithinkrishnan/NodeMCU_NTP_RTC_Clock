@@ -1,8 +1,9 @@
 /************************************************************************
 *   ESP8266 NTP - DS3231 RTC HW-069 Display Time sync
 *   File:   NodeMCU_NTP_RTC_Clock.ino
+*   Arduino IDE Ver 2.1.0 
 *   Author:  Jithin Krishnan.K
-*       Rev. 1.0 : 10/11/2020 :  03:42 PM
+*       Rev. 2.0 : 11/06/2023 :  17:49 PM
 * 
 * This program is free software: you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License as published by
@@ -27,10 +28,10 @@
 #include <Time.h>
 #include <TimeLib.h>
 #include <TM1637Display.h>
-#include "DS3231.h"
+#include <DS3231.h>
 
-#define SOFT_SDA  4  // D2    
-#define SOFT_SCL  5 //  D1
+//#define SOFT_SDA  4  // D2    
+//#define SOFT_SCL  5 //  D1
 #define CLK 2       //  D4
 #define DIO 0       //  D3
 
@@ -45,8 +46,8 @@ DS3231 clk;
 RTCDateTime dt, ist_dt;
 TM1637Display display(CLK, DIO);
 
-char ssid[] = "*******";    // SSID
-char pass[] = "*******";;   // Wifi Password
+char ssid[] = "Krishna";    // SSID
+char pass[] = "12345678";;   // Wifi Password
 unsigned int localPort = 2390;
 
 IPAddress timeServerIP; 
@@ -61,7 +62,7 @@ WiFiUDP udp;
 
 void setup()
 {
-  clk.begin(SOFT_SDA, SOFT_SCL); // In NodeMCU, SDA=4, SCL=5  
+  clk.begin(); // In NodeMCU, SDA=4, SCL=5  
   display.setBrightness(0x0f);
 }
 
@@ -123,6 +124,8 @@ void loop()
   }    
   X:
       delay(800);
+
+      return;
 }
 
 
@@ -139,4 +142,6 @@ unsigned long sendNTPpacket(IPAddress& address) {
    udp.beginPacket(address, 123); //NTP requests are to port 123
    udp.write(packetBuffer, NTP_PACKET_SIZE);
    udp.endPacket();
+
+   return 0;
 }
