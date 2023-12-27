@@ -44,8 +44,8 @@ DS3231 clk;
 RTCDateTime dt, ist_dt;
 TM1637Display display(CLK, DIO);
 
-char ssid[] = "*************";         // SSID
-char pass[] = "*************";;    // Wifi Password
+char ssid[] = "KrishnaGW";         // SSID
+char pass[] = "jk88!@#THk215";;    // Wifi Password
 unsigned int localPort = 2390;
 
 IPAddress timeServerIP; 
