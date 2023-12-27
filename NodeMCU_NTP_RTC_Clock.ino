@@ -30,15 +30,13 @@
 #include <TM1637Display.h>
 #include <DS3231.h>
 
-//#define SOFT_SDA  4  // D2    
-//#define SOFT_SCL  5 //  D1
 #define CLK 2       //  D4
 #define DIO 0       //  D3
 
 const uint8_t SEG_SYNC[] = {
   SEG_A | SEG_F | SEG_G | SEG_C | SEG_D,           // S
-  SEG_F | SEG_G | SEG_B | SEG_C | SEG_D,           // y
-  SEG_E | SEG_F | SEG_A | SEG_B | SEG_C,           // n
+  SEG_F | SEG_G | SEG_B | SEG_C | SEG_D,           // Y
+  SEG_E | SEG_F | SEG_A | SEG_B | SEG_C,           // N
   SEG_A | SEG_F | SEG_E | SEG_D                    // C
   };
 
@@ -46,8 +44,8 @@ DS3231 clk;
 RTCDateTime dt, ist_dt;
 TM1637Display display(CLK, DIO);
 
-char ssid[] = "Krishna";    // SSID
-char pass[] = "12345678";;   // Wifi Password
+char ssid[] = "*************";         // SSID
+char pass[] = "*************";;    // Wifi Password
 unsigned int localPort = 2390;
 
 IPAddress timeServerIP; 
@@ -55,7 +53,7 @@ const char* ntpServerName = "time.nist.gov";
 const int NTP_PACKET_SIZE = 48;
 byte packetBuffer[ NTP_PACKET_SIZE];
 
-char do_once = 0, cnt = 0;
+char cnt = 0;
 uint8_t data[] = { 0x00, 0x00, 0x00, 0x00 };
 
 WiFiUDP udp;
@@ -64,6 +62,17 @@ void setup()
 {
   clk.begin(); // In NodeMCU, SDA=4, SCL=5  
   display.setBrightness(0x0f);
+  display.setSegments(SEG_SYNC);
+  
+  WiFi.begin(ssid, pass);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      cnt++;
+      if (cnt > 10) {
+         break;
+       }
+    }
 }
 
 void loop()
@@ -72,29 +81,14 @@ void loop()
     display.showNumberDecEx(dt.minute, 0, true,2 ,2);
     display.showNumberDecEx(dt.hour, 0b01000000, true,2 ,0);
    
-    if (dt.hour == 12 && dt.minute == 15 && dt.second == 0){
-      do_once = 0;
-    }
-
-  if (!do_once) {
-      display.setSegments(SEG_SYNC); 
-      WiFi.begin(ssid, pass);
-      while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      cnt++;
-      if (cnt > 20) {
-         cnt = 0;
-         do_once = -1;
-         goto X;
-      }
-    }
-  
-    udp.begin(localPort);
-    WiFi.hostByName(ntpServerName, timeServerIP);
-    sendNTPpacket(timeServerIP);
-    delay(1000);
-
-    int cb = udp.parsePacket();
+     
+    
+    if (WiFi.status() == WL_CONNECTED) {
+        udp.begin(localPort);
+        WiFi.hostByName(ntpServerName, timeServerIP);
+        sendNTPpacket(timeServerIP); 
+        delay(1000);
+        int cb = udp.parsePacket();
   
     if (cb) {
         udp.read(packetBuffer, NTP_PACKET_SIZE);
@@ -118,14 +112,11 @@ void loop()
         ist_dt.hour != dt.hour) || (ist_dt.minute != dt.minute) || (ist_dt.second != dt.second))  {
         clk.setDateTime(ist_dt.year, ist_dt.month, ist_dt.day, ist_dt.hour, ist_dt.minute, ist_dt.second);
     }
-   }  
+   }
     WiFi.disconnect();
-    do_once = -1;
-  }    
-  X:
-      delay(800);
-
-      return;
+  }      
+  delay(800);
+  return;
 }
 
 
